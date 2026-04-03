@@ -7,12 +7,22 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css" />
     <style>
       .star { color: #ef4444; margin-left: 2px; }
-      .modal-bg { background: rgba(0,0,0,0.4);}
+      .modal-bg { background: rgba(0,0,0,0.4); }
       .hidden { display: none; }
       .all-form-data {
         font-family: 'Courier New', monospace;
         font-size: 12px;
         line-height: 1.4;
+      }
+      .disclaimer-box {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        font-style: italic;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-top: 4px;
       }
     </style>
   </head>
@@ -25,13 +35,11 @@
       autocomplete="off"
       novalidate
     >
-      
-      <!-- All Form Data - HIDDEN JSON CAPTURE -->
-      <textarea 
-        id="00NU7000008TS4L" 
-        name="00NU7000008TS4L" 
-        rows="50" 
-        type="text" 
+      <textarea
+        id="00NU7000008TS4L"
+        name="00NU7000008TS4L"
+        rows="50"
+        type="text"
         wrap="soft"
         class="hidden all-form-data"
       ></textarea>
@@ -40,7 +48,6 @@
         Add Vehicle Cincinnati Form
       </h2>
 
-      <!-- Policy Changes Section -->
       <section class="bg-gray-50 border rounded-xl p-6 shadow-inner" aria-label="Policy Changes Section">
         <h3 class="text-xl font-semibold mb-4 text-gray-700">Policy Changes</h3>
 
@@ -57,7 +64,7 @@
             required
           />
         </div>
-      
+
         <fieldset class="mb-4">
           <legend class="block text-sm font-medium text-gray-700 mb-1">
             Select the Request Type:<span class="star">*</span>
@@ -70,7 +77,6 @@
               <input type="radio" name="requestTypeRadios" value="N" class="mr-2" required />Endorsement
             </label>
           </div>
-          <!-- Hidden select field mapped to radio buttons -->
           <select id="00NU7000006IOzh" name="Is_this_a_quote_or_a_change_request__c" class="hidden" required>
             <option value=""></option>
             <option value="Y">Y</option>
@@ -107,10 +113,8 @@
             required
           />
         </div>
-
       </section>
 
-      <!-- Vehicle Information Section -->
       <section class="bg-gray-50 border rounded-xl p-6 shadow-inner" aria-label="Vehicle Information Section">
         <h3 class="text-xl font-semibold mb-4 text-gray-700">Vehicle Information</h3>
 
@@ -187,11 +191,30 @@
             autocomplete="off"
             required
           />
+          <div class="disclaimer-box">
+            Please check if the VIN you are trying to add is valid or not by referring here
+            <a href="https://www.carfax.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">
+              [https://www.carfax.com/](https://www.carfax.com/)
+            </a>
+          </div>
         </div>
 
+        <div class="mb-4">
+          <label for="00NU7000008lT1x" class="block text-sm font-medium text-gray-700">
+            Car New Cost Value<span class="star">*</span>
+          </label>
+          <input
+            type="text"
+            id="00NU7000008lT1x"
+            name="00NU7000008lT1x"
+            maxlength="100"
+            class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            autocomplete="off"
+            required
+          />
+        </div>
       </section>
 
-      <!-- Coverages Section -->
       <section class="bg-gray-50 border rounded-xl p-6 shadow-inner" aria-label="Coverages Section">
         <h3 class="text-xl font-semibold mb-4 text-gray-700">Coverages</h3>
 
@@ -338,10 +361,8 @@
           </label>
           <input type="hidden" name="00NU7000008Aduj" value="N" />
         </div>
-
       </section>
-      
-      <!-- Hidden Salesforce fields -->
+
       <input type="hidden" name="oid" value="00DU7000006EuID" />
       <input type="hidden" name="retURL" value="https://bennettandporter.com/" />
       <input type="hidden" name="first_name" value="Cincinnati" />
@@ -367,7 +388,6 @@
       </div>
     </form>
 
-    <!-- Confirmation Dialog -->
     <div
       id="dialog"
       class="hidden fixed inset-0 flex items-center justify-center modal-bg z-50"
@@ -395,357 +415,353 @@
       </div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  let picker = null;
-  let yearPicker = null;
+    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let picker = null;
+        let yearPicker = null;
+        const dateInput = document.getElementById("00NU7000005zuLl");
+        const yearInput = document.getElementById("00NU7000007EGYk");
+        const policyInput = document.getElementById("00NU7000005zuX3");
 
-  /* ===================== FIXED DATE PICKER ===================== */
-  const dateInput = document.getElementById("00NU7000005zuLl");
-  const yearInput = document.getElementById("00NU7000007EGYk");
-  
-  if (window.Pikaday && dateInput) {
-    picker = new Pikaday({
-      field: dateInput,
-      format: "MM/DD/YYYY",
-      toString(date) {
-        const d = String(date.getDate()).padStart(2, "0");
-        const m = String(date.getMonth() + 1).padStart(2, "0");
-        const y = date.getFullYear();
-        return `${m}/${d}/${y}`;
-      },
-      parse(dateString) {
-        if (!dateString) return null;
-        const [m, d, y] = dateString.split("/");
-        return new Date(y, m - 1, d);
-      },
-      onSelect: function() {
-        dateInput.value = this.toString();
-      },
-      onClose: function() {
-        if (this.getDate()) {
-          dateInput.value = this.toString();
+        if (policyInput) {
+          policyInput.addEventListener("input", function () {
+            const compact = this.value.replace(/\s+/g, "").replace(/[^A-Za-z0-9]/g, "");
+            if (compact.length <= 3) this.value = compact;
+            else this.value = `${compact.slice(0, 3)} ${compact.slice(3)}`;
+          });
         }
-      }
-    });
-  }
 
-  /* ===================== YEAR PICKER ===================== */
-  if (window.Pikaday && yearInput) {
-    yearPicker = new Pikaday({
-      field: yearInput,
-      format: "YYYY",
-      minDate: new Date(1900, 0, 1),
-      maxDate: new Date(2100, 11, 31),
-      yearRange: [1900, 2100],
-      toString(date) {
-        return String(date.getFullYear());
-      },
-      parse(dateString) {
-        const year = parseInt(dateString, 10);
-        if (!year || String(year).length !== 4) return null;
-        return new Date(year, 0, 1);
-      },
-      onSelect() {
-        yearInput.value = String(this.getDate().getFullYear()).slice(0, 4);
-      },
-      onOpen() {
-        const current = parseInt(yearInput.value, 10);
-        if (!isNaN(current) && String(current).length === 4) {
-          this.setDate(new Date(current, 0, 1), true);
+        if (window.Pikaday && dateInput) {
+          picker = new Pikaday({
+            field: dateInput,
+            format: "MM/DD/YYYY",
+            toString(date) {
+              const d = String(date.getDate()).padStart(2, "0");
+              const m = String(date.getMonth() + 1).padStart(2, "0");
+              const y = date.getFullYear();
+              return `${m}/${d}/${y}`;
+            },
+            parse(dateString) {
+              if (!dateString) return null;
+              const [m, d, y] = dateString.split("/");
+              return new Date(y, m - 1, d);
+            },
+            onSelect() {
+              dateInput.value = this.toString();
+            },
+            onClose() {
+              if (this.getDate()) {
+                dateInput.value = this.toString();
+              }
+            }
+          });
         }
-      }
-    });
 
-    yearInput.addEventListener("input", () => {
-      yearInput.value = yearInput.value.replace(/\D/g, "").slice(0, 4);
-    });
-  }
+        if (window.Pikaday && yearInput) {
+          yearPicker = new Pikaday({
+            field: yearInput,
+            format: "YYYY",
+            minDate: new Date(1900, 0, 1),
+            maxDate: new Date(2100, 11, 31),
+            yearRange: [1900, 2100],
+            toString(date) {
+              return String(date.getFullYear());
+            },
+            parse(dateString) {
+              const year = parseInt(dateString, 10);
+              if (!year || String(year).length !== 4) return null;
+              return new Date(year, 0, 1);
+            },
+            onSelect() {
+              yearInput.value = String(this.getDate().getFullYear()).slice(0, 4);
+            },
+            onOpen() {
+              const current = parseInt(yearInput.value, 10);
+              if (!isNaN(current) && String(current).length === 4) {
+                this.setDate(new Date(current, 0, 1), true);
+              }
+            }
+          });
 
-  /* ===================== CHECKBOX → HIDDEN FIELD SYNC ===================== */
-  function syncCheckboxToHidden(checkboxId, hiddenName) {
-    const checkbox = document.getElementById(checkboxId);
-    const hiddenInputs = document.querySelectorAll(`input[type="hidden"][name="${hiddenName}"]`);
-    
-    if (checkbox && hiddenInputs.length) {
-      const hidden = hiddenInputs[0];
-      checkbox.addEventListener("change", () => {
-        hidden.value = checkbox.checked ? "Y" : "N";
+          yearInput.addEventListener("input", () => {
+            yearInput.value = yearInput.value.replace(/\D/g, "").slice(0, 4);
+          });
+        }
+
+        function syncCheckboxToHidden(checkboxId, hiddenName) {
+          const checkbox = document.getElementById(checkboxId);
+          const hiddenInputs = document.querySelectorAll(`input[type="hidden"][name="${hiddenName}"]`);
+
+          if (checkbox && hiddenInputs.length) {
+            const hidden = hiddenInputs[0];
+            checkbox.addEventListener("change", () => {
+              hidden.value = checkbox.checked ? "Y" : "N";
+            });
+            hidden.value = checkbox.checked ? "Y" : "N";
+          }
+        }
+
+        syncCheckboxToHidden("00NU7000008AbwA", "00NU7000008AbwA");
+        syncCheckboxToHidden("00NU7000008AYAI", "00NU7000008AYAI");
+        syncCheckboxToHidden("00NU7000008Absz", "00NU7000008Absz");
+        syncCheckboxToHidden("00NU7000008Aduj", "00NU7000008Aduj");
+
+        const replacementCostCheckbox = document.getElementById("00NU7000008Absz");
+        const gapCoverageCheckbox = document.getElementById("00NU7000008Aduj");
+
+        if (replacementCostCheckbox && gapCoverageCheckbox) {
+          replacementCostCheckbox.addEventListener("change", () => {
+            if (replacementCostCheckbox.checked) {
+              gapCoverageCheckbox.checked = false;
+              const hiddenGap = document.querySelector('input[type="hidden"][name="00NU7000008Aduj"]');
+              if (hiddenGap) hiddenGap.value = "N";
+            }
+          });
+
+          gapCoverageCheckbox.addEventListener("change", () => {
+            if (gapCoverageCheckbox.checked) {
+              replacementCostCheckbox.checked = false;
+              const hiddenReplacement = document.querySelector('input[type="hidden"][name="00NU7000008Absz"]');
+              if (hiddenReplacement) hiddenReplacement.value = "N";
+            }
+          });
+        }
+
+        const customEquipCheckbox = document.getElementById("00NU7000008AYAI");
+        const customPartsField = document.getElementById("customPartsField");
+
+        function toggleCustomParts() {
+          if (customEquipCheckbox && customEquipCheckbox.checked) {
+            customPartsField.classList.remove("hidden");
+          } else {
+            customPartsField.classList.add("hidden");
+            document.getElementById("00NU7000007QrCj").value = "";
+          }
+        }
+
+        if (customEquipCheckbox) {
+          customEquipCheckbox.addEventListener("change", toggleCustomParts);
+          toggleCustomParts();
+        }
+
+        const requestRadios = document.querySelectorAll('input[name="requestTypeRadios"]');
+        const requestHiddenSelect = document.getElementById("00NU7000006IOzh");
+
+        function syncRequestType() {
+          const checkedRadio = document.querySelector('input[name="requestTypeRadios"]:checked');
+          requestHiddenSelect.value = checkedRadio ? checkedRadio.value : "";
+        }
+
+        requestRadios.forEach(radio => radio.addEventListener("change", syncRequestType));
+        syncRequestType();
+
+        const reviewBtn = document.getElementById("reviewBtn");
+        const dialog = document.getElementById("dialog");
+        const dialogTitle = document.getElementById("dialogTitle");
+        const missingFieldsList = document.getElementById("missingFieldsList");
+        const proceedBtn = document.getElementById("proceedBtn");
+        const editBtn = document.getElementById("editBtn");
+        const form = document.getElementById("mainForm");
+        const allFormDataTextarea = document.getElementById("00NU7000008TS4L");
+
+        const requiredFields = [
+          { id: "email", label: "Email", type: "email" },
+          { radioGroupName: "requestTypeRadios", label: "Select the Request Type:" },
+          { id: "00NU7000005zuX3", label: "Policy Number", type: "policy" },
+          { id: "00NU7000005zuLl", label: "Effective Date (MM/DD/YYYY)", type: "date" },
+          { id: "00NU7000007EGYk", label: "New Vehicle Year", type: "year" },
+          { id: "00NU700000616W9", label: "New Vehicle Make" },
+          { id: "00NU700000616Xl", label: "New Vehicle Model" },
+          { id: "00NU7000006Knh3", label: "VIN Number of New Vehicle" },
+          { id: "00NU7000008lT1x", label: "Car New Cost Value" }
+        ];
+
+        function formatDateForJSON(dateString) {
+          if (!dateString) return "";
+          const [m, d, y] = dateString.split("/");
+          return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+        }
+
+        function captureAllFormDataAsJSON() {
+          const formData = {};
+          const formElements = form.querySelectorAll("input, textarea, select");
+          formElements.forEach(element => {
+            if (
+              !element.name ||
+              element.name === "Form_Captured_Data__c" ||
+              element.name === "Form_Missing_Data__c" ||
+              element.name === "00NU7000008TS4L" ||
+              element.name === "requestTypeRadios"
+            ) {
+              return;
+            }
+
+            let fieldName = element.name.replace(/__c$/, "");
+            const skipFields = ["company", "delete_Action_Form", "lead_source", "phone", "status", "last_name", "first_name", "retURL", "oid"];
+            if (skipFields.includes(fieldName)) return;
+
+            const fieldMapping = {
+              "00NU7000005zuNN": "Policy_Action",
+              "Policy_Number": "Policy_Number",
+              "Carrier": "Carrier",
+              "Is_this_a_quote_or_a_change_request": "Is_this_a_quote_or_a_change_request",
+              "Date": "Effective_Date",
+              "email": "Email",
+              "00NU7000006N0zx": "Annual_Miles",
+              "00NU7000007EGYk": "Vehicle_Year",
+              "00NU700000616W9": "Make",
+              "00NU700000616Xl": "Model",
+              "00NU7000006Knh3": "VIN_number_2",
+              "00NU7000008lT1x": "Car_New_Cost_Value",
+              "00NU7000007ALC1": "Other_than_Collision",
+              "00NU7000008AbwA": "Full_Safety_Glass",
+              "00NU700000618cn": "Collision",
+              "00NU7000008AYAI": "Customizing_Equipment",
+              "00NU7000007QrCj": "Custom_Parts_and_or_Equipment_value",
+              "00NU700000618hd": "Roadside_Assistance",
+              "00NU7000008Adt7": "Transportation_Expense",
+              "00NU7000008Absz": "Replacement_Cost",
+              "00NU7000008Aduj": "GAP_Coverage"
+            };
+
+            fieldName = fieldMapping[fieldName] || fieldName;
+
+            if (fieldName === "Effective_Date" && element.value) {
+              formData[fieldName] = formatDateForJSON(element.value);
+            } else {
+              formData[fieldName] = element.value || "";
+            }
+          });
+
+          return JSON.stringify(formData, null, 2);
+        }
+
+        function validateYear(val) {
+          return /^[0-9]{4}$/.test(val);
+        }
+
+        function validatePolicyNumber(val) {
+          return /^[A-Za-z0-9]{3}\s[A-Za-z0-9].*/.test(val.trim());
+        }
+
+        function validateFields() {
+          const missing = [];
+
+          requiredFields.forEach(field => {
+            if (field.radioGroupName) {
+              const radios = document.querySelectorAll(`input[name="${field.radioGroupName}"]`);
+              const checked = [...radios].some(r => r.checked);
+              if (!checked) missing.push(field.label);
+              return;
+            }
+
+            const el = document.getElementById(field.id);
+            if (!el) return;
+
+            if (field.type === "email") {
+              if (!el.value.trim() || !el.checkValidity()) missing.push(field.label);
+            } else if (field.type === "date") {
+              const val = el.value.trim();
+              const dateRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}$/;
+              if (!val || !dateRegex.test(val)) missing.push(field.label);
+            } else if (field.type === "year") {
+              const val = el.value.trim();
+              if (!val || !validateYear(val)) missing.push(field.label);
+            } else if (field.type === "policy") {
+              if (!el.value.trim() || !validatePolicyNumber(el.value)) missing.push(field.label);
+            } else {
+              if (!el.value.trim()) missing.push(field.label);
+            }
+          });
+
+          return missing;
+        }
+
+        function captureFormData() {
+          if (picker && picker.getDate()) {
+            dateInput.value = picker.toString();
+          }
+
+          const missing = [];
+          const filled = [];
+
+          requiredFields.forEach(field => {
+            if (field.radioGroupName) {
+              const radios = document.querySelectorAll(`input[name="${field.radioGroupName}"]`);
+              const checked = [...radios].find(r => r.checked);
+              if (checked) filled.push(`${field.label}: ${checked.value}`);
+              else missing.push(field.label);
+              return;
+            }
+
+            const el = document.getElementById(field.id);
+            if (!el || !el.value.trim()) {
+              missing.push(field.label);
+            } else {
+              filled.push(`${field.label}: ${el.value.trim()}`);
+            }
+          });
+
+          let missingField = document.getElementById("Form_Missing_Data__c");
+          let capturedField = document.getElementById("Form_Captured_Data__c");
+
+          if (!missingField) {
+            missingField = document.createElement("input");
+            missingField.type = "hidden";
+            missingField.id = "Form_Missing_Data__c";
+            missingField.name = "Form_Missing_Data__c";
+            form.appendChild(missingField);
+          }
+
+          if (!capturedField) {
+            capturedField = document.createElement("input");
+            capturedField.type = "hidden";
+            capturedField.id = "Form_Captured_Data__c";
+            capturedField.name = "Form_Captured_Data__c";
+            form.appendChild(capturedField);
+          }
+
+          missingField.value = missing.join("\n");
+          capturedField.value = filled.join("\n");
+        }
+
+        reviewBtn.addEventListener("click", () => {
+          const missing = validateFields();
+          allFormDataTextarea.value = captureAllFormDataAsJSON();
+
+          if (missing.length) {
+            dialogTitle.textContent = "Below Mandatory Fields are missing and the Team will contact you shortly.";
+            missingFieldsList.innerHTML = missing.map(f => `<li>${f}</li>`).join("");
+          } else {
+            dialogTitle.textContent = "All mandatory fields are completed. Ready to submit your request?";
+            missingFieldsList.innerHTML = "";
+          }
+
+          dialog.classList.remove("hidden");
+        });
+
+        editBtn.addEventListener("click", () => dialog.classList.add("hidden"));
+
+        proceedBtn.addEventListener("click", () => {
+          captureFormData();
+          dialog.classList.add("hidden");
+          if (picker && picker.getDate()) {
+            dateInput.value = picker.toString();
+          }
+          form.submit();
+        });
+
+        window.addEventListener("click", e => {
+          if (e.target === dialog) dialog.classList.add("hidden");
+        });
+
+        window.addEventListener("keydown", e => {
+          if (e.key === "Escape" && !dialog.classList.contains("hidden")) {
+            dialog.classList.add("hidden");
+          }
+        });
       });
-      // Initial sync
-      hidden.value = checkbox.checked ? "Y" : "N";
-    }
-  }
-
-  // Sync all Y/N checkboxes
-  syncCheckboxToHidden("00NU7000008AbwA", "00NU7000008AbwA");
-  syncCheckboxToHidden("00NU7000008AYAI", "00NU7000008AYAI");
-  syncCheckboxToHidden("00NU7000008Absz", "00NU7000008Absz");
-  syncCheckboxToHidden("00NU7000008Aduj", "00NU7000008Aduj");
-
-  /* ===================== MUTUALLY EXCLUSIVE: Replacement Cost & GAP Coverage ===================== */
-  const replacementCostCheckbox = document.getElementById("00NU7000008Absz");
-  const gapCoverageCheckbox = document.getElementById("00NU7000008Aduj");
-  
-  if (replacementCostCheckbox && gapCoverageCheckbox) {
-    replacementCostCheckbox.addEventListener("change", () => {
-      if (replacementCostCheckbox.checked) {
-        gapCoverageCheckbox.checked = false;
-        const hiddenGap = document.querySelector('input[type="hidden"][name="00NU7000008Aduj"]');
-        if (hiddenGap) hiddenGap.value = "N";
-      }
-    });
-    
-    gapCoverageCheckbox.addEventListener("change", () => {
-      if (gapCoverageCheckbox.checked) {
-        replacementCostCheckbox.checked = false;
-        const hiddenReplacement = document.querySelector('input[type="hidden"][name="00NU7000008Absz"]');
-        if (hiddenReplacement) hiddenReplacement.value = "N";
-      }
-    });
-  }
-
-  /* ===================== CUSTOM PARTS TOGGLE ===================== */
-  const customEquipCheckbox = document.getElementById("00NU7000008AYAI");
-  const customPartsField = document.getElementById("customPartsField");
-
-  function toggleCustomParts() {
-    if (customEquipCheckbox && customEquipCheckbox.checked) {
-      customPartsField.classList.remove("hidden");
-    } else {
-      customPartsField.classList.add("hidden");
-      document.getElementById("00NU7000007QrCj").value = "";
-    }
-  }
-
-  if (customEquipCheckbox) {
-    customEquipCheckbox.addEventListener("change", toggleCustomParts);
-    toggleCustomParts(); // Initial state
-  }
-
-  /* ===================== RADIO → HIDDEN FIELD ===================== */
-  const radios = document.querySelectorAll('input[name="requestTypeRadios"]');
-  const hiddenSelect = document.getElementById("00NU7000006IOzh");
-
-  function syncRequestType() {
-    const checkedRadio = document.querySelector('input[name="requestTypeRadios"]:checked');
-    hiddenSelect.value = checkedRadio ? checkedRadio.value : "";
-  }
-
-  radios.forEach(radio => radio.addEventListener("change", syncRequestType));
-  syncRequestType();
-
-  /* ===================== FORM ELEMENTS ===================== */
-  const reviewBtn = document.getElementById("reviewBtn");
-  const dialog = document.getElementById("dialog");
-  const dialogTitle = document.getElementById("dialogTitle");
-  const missingFieldsList = document.getElementById("missingFieldsList");
-  const proceedBtn = document.getElementById("proceedBtn");
-  const editBtn = document.getElementById("editBtn");
-  const form = document.getElementById("mainForm");
-  const allFormDataTextarea = document.getElementById("00NU7000008TS4L");
-  
-  const requiredFields = [
-    { id: "email", label: "Email", type: "email" },
-    { radioGroupName: "requestTypeRadios", label: "Select the Request Type:" },
-    { id: "00NU7000005zuX3", label: "Policy Number" },
-    { id: "00NU7000005zuLl", label: "Effective Date (MM/DD/YYYY)", type: "date" },
-    { id: "00NU7000007EGYk", label: "New Vehicle Year", type: "year" },
-    { id: "00NU700000616W9", label: "New Vehicle Make" },
-    { id: "00NU700000616Xl", label: "New Vehicle Model" },
-    { id: "00NU7000006Knh3", label: "VIN Number of New Vehicle" }
-  ];
-
-  // ================= DATE FORMAT FOR JSON =================
-  function formatDateForJSON(dateString) {
-    if (!dateString) return '';
-    const [m, d, y] = dateString.split('/');
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  }
-
-  // ================= CAPTURE ALL FORM DATA AS JSON =================
-  function captureAllFormDataAsJSON() {
-    const formData = {};
-    const formElements = form.querySelectorAll('input, textarea, select');
-    
-    formElements.forEach(element => {
-      if (
-        !element.name ||
-        element.name === 'Form_Captured_Data__c' ||
-        element.name === 'Form_Missing_Data__c' ||
-        element.name === '00NU7000008TS4L' ||
-        element.name === 'requestTypeRadios'
-      ) {
-        return;
-      }
-
-      let fieldName = element.name.replace(/__c$/, '');
-      const skipFields = ['company', 'delete_Action_Form', 'lead_source', 'phone', 'status', 'last_name', 'first_name', 'retURL', 'oid'];
-      
-      if (skipFields.includes(fieldName)) return;
-
-      const fieldMapping = {
-        '00NU7000005zuNN': 'Policy_Action',
-        'Policy_Number': 'Policy_Number',
-        'Carrier': 'Carrier',
-        'Is_this_a_quote_or_a_change_request': 'Is_this_a_quote_or_a_change_request',
-        'Date': 'Effective_Date',
-        'email': 'Email',
-        '00NU7000006N0zx': 'Annual_Miles',
-        '00NU7000006Knh3': 'VIN_number_2',
-        '00NU7000007EGYk': 'Vehicle_Year',
-        '00NU700000616W9': 'Make',
-        '00NU700000616Xl': 'Model',
-        '00NU7000007ALC1': 'Other_than_Collision',
-        '00NU7000008AbwA': 'Full_Safety_Glass',
-        '00NU700000618cn': 'Collision',
-        '00NU7000008AYAI': 'Customizing_Equipment',
-        '00NU7000007QrCj': 'Custom_Parts_and_or_Equipment_value',
-        '00NU700000618hd': 'Roadside_Assistance',
-        '00NU7000008Adt7': 'Transportation_Expense',
-        '00NU7000008Absz': 'Replacement_Cost',
-        '00NU7000008Aduj': 'GAP_Coverage'
-      };
-
-      fieldName = fieldMapping[fieldName] || fieldName;
-
-      if (fieldName === 'Effective_Date' && element.value) {
-        formData[fieldName] = formatDateForJSON(element.value);
-      } else {
-        formData[fieldName] = element.value || '';
-      }
-    });
-
-    return JSON.stringify(formData, null, 2);
-  }
-
-  /* ===================== VALIDATION ===================== */
-  function validateYear(val) {
-    return /^[0-9]{4}$/.test(val);
-  }
-
-  function validateFields() {
-    const missing = [];
-
-    requiredFields.forEach(field => {
-      if (field.radioGroupName) {
-        const radios = document.querySelectorAll(`input[name="${field.radioGroupName}"]`);
-        const checked = [...radios].some(r => r.checked);
-        if (!checked) missing.push(field.label);
-        return;
-      }
-
-      const el = document.getElementById(field.id);
-      if (!el) return;
-
-      if (field.type === "email") {
-        if (!el.value.trim() || !el.checkValidity()) missing.push(field.label);
-      }
-      else if (field.type === "date") {
-        const val = el.value.trim();
-        const dateRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}$/;
-        if (!val || !dateRegex.test(val)) missing.push(field.label);
-      }
-      else if (field.type === "year") {
-        const val = el.value.trim();
-        if (!val || !validateYear(val)) missing.push(field.label);
-      }
-      else {
-        if (!el.value.trim()) missing.push(field.label);
-      }
-    });
-
-    return missing;
-  }
-
-  /* ===================== FORM CAPTURE ===================== */
-  function captureFormData() {
-    if (picker && picker.getDate()) {
-      dateInput.value = picker.toString();
-    }
-
-    const missing = [];
-    const filled = [];
-
-    requiredFields.forEach(field => {
-      if (field.radioGroupName) {
-        const radios = document.querySelectorAll(`input[name="${field.radioGroupName}"]`);
-        const checked = [...radios].find(r => r.checked);
-        if (checked) filled.push(`${field.label}: ${checked.value}`);
-        else missing.push(field.label);
-        return;
-      }
-
-      const el = document.getElementById(field.id);
-      if (!el || !el.value.trim()) {
-        missing.push(field.label);
-      } else {
-        filled.push(`${field.label}: ${el.value.trim()}`);
-      }
-    });
-
-    let missingField = document.getElementById("Form_Missing_Data__c");
-    let capturedField = document.getElementById("Form_Captured_Data__c");
-
-    if (!missingField) {
-      missingField = document.createElement("input");
-      missingField.type = "hidden";
-      missingField.id = "Form_Missing_Data__c";
-      missingField.name = "Form_Missing_Data__c";
-      form.appendChild(missingField);
-    }
-
-    if (!capturedField) {
-      capturedField = document.createElement("input");
-      capturedField.type = "hidden";
-      capturedField.id = "Form_Captured_Data__c";
-      capturedField.name = "Form_Captured_Data__c";
-      form.appendChild(capturedField);
-    }
-
-    missingField.value = missing.join("\n");
-    capturedField.value = filled.join("\n");
-  }
-
-  /* ===================== UI FLOW ===================== */
-  reviewBtn.addEventListener("click", () => {
-    const missing = validateFields();
-    allFormDataTextarea.value = captureAllFormDataAsJSON();
-    
-    if (missing.length) {
-      dialogTitle.textContent = "Below Mandatory Fields are missing and the Team will contact you shortly.";
-      missingFieldsList.innerHTML = missing.map(f => `<li>${f}</li>`).join("");
-    } else {
-      dialogTitle.textContent = "All mandatory fields are completed. Ready to submit your request?";
-      missingFieldsList.innerHTML = "";
-    }
-
-    dialog.classList.remove("hidden");
-  });
-
-  editBtn.addEventListener("click", () => dialog.classList.add("hidden"));
-
-  proceedBtn.addEventListener("click", () => {
-    captureFormData();
-    dialog.classList.add("hidden");
-    if (picker && picker.getDate()) {
-      dateInput.value = picker.toString();
-    }
-    form.submit();
-  });
-
-  // Close dialog on outside click or Escape
-  window.addEventListener("click", e => {
-    if (e.target === dialog) dialog.classList.add("hidden");
-  });
-
-  window.addEventListener("keydown", e => {
-    if (e.key === "Escape" && !dialog.classList.contains("hidden")) {
-      dialog.classList.add("hidden");
-    }
-  });
-});
-</script>
-</body>
+    </script>
+  </body>
 </html>
