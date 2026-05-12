@@ -119,6 +119,62 @@
         <h3 class="text-xl font-semibold mb-4 text-gray-700">Vehicle Information</h3>
 
         <div class="mb-4">
+          <div class="disclaimer-box">
+            Hey, could you please check the policy declaration page we sent over email? In the column under Additional Coverages can you confirm whether there is <strong>Capstone Auto Endorsement</strong>?
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <fieldset>
+            <legend class="block text-sm font-medium text-gray-700 mb-1">
+              If Capstone Policy or Not:<span class="star">*</span>
+            </legend>
+            <div class="flex space-x-6">
+              <label class="inline-flex items-center">
+                <input type="radio" name="IfCapstonePolicyRadios" value="Y" class="mr-2" />Yes
+              </label>
+              <label class="inline-flex items-center">
+                <input type="radio" name="IfCapstonePolicyRadios" value="N" class="mr-2" />No
+              </label>
+            </div>
+            <input type="hidden" id="00NU7000009B269" name="IfCapstonePolicy__c" value="" />
+          </fieldset>
+        </div>
+
+        <div class="mb-4">
+          <label for="00NU7000009B2Cb" class="block text-sm font-medium text-gray-700">
+            User Agreed Value<span class="star">*</span>
+          </label>
+          <input
+            id="00NU7000009B2Cb"
+            maxlength="50"
+            name="00NU7000009B2Cb"
+            size="20"
+            type="text"
+            class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            autocomplete="off"
+            disabled
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="00NU7000008lT1x" class="block text-sm font-medium text-gray-700">
+            Car New Cost Value<span class="star">*</span>
+          </label>
+          <input
+            type="text"
+            id="00NU7000008lT1x"
+            name="00NU7000008lT1x"
+            maxlength="100"
+            class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            autocomplete="off"
+            disabled
+            required
+          />
+        </div>
+
+        <div class="mb-4">
           <label for="00NU7000006N0zx" class="block text-sm font-medium text-gray-700">
             Annual Miles
           </label>
@@ -197,21 +253,6 @@
               [https://www.carfax.com/]
             </a>
           </div>
-        </div>
-
-        <div class="mb-4">
-          <label for="00NU7000008lT1x" class="block text-sm font-medium text-gray-700">
-            Car New Cost Value<span class="star">*</span>
-          </label>
-          <input
-            type="text"
-            id="00NU7000008lT1x"
-            name="00NU7000008lT1x"
-            maxlength="100"
-            class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            autocomplete="off"
-            required
-          />
         </div>
       </section>
 
@@ -423,6 +464,10 @@
         const dateInput = document.getElementById("00NU7000005zuLl");
         const yearInput = document.getElementById("00NU7000007EGYk");
         const policyInput = document.getElementById("00NU7000005zuX3");
+        const capstoneRadios = document.querySelectorAll('input[name="IfCapstonePolicyRadios"]');
+        const capstoneHidden = document.getElementById("00NU7000009B269");
+        const userAgreedValue = document.getElementById("00NU7000009B2Cb");
+        const carNewCostValue = document.getElementById("00NU7000008lT1x");
 
         if (policyInput) {
           policyInput.addEventListener("input", function () {
@@ -451,9 +496,7 @@
               dateInput.value = this.toString();
             },
             onClose() {
-              if (this.getDate()) {
-                dateInput.value = this.toString();
-              }
+              if (this.getDate()) dateInput.value = this.toString();
             }
           });
         }
@@ -492,7 +535,6 @@
         function syncCheckboxToHidden(checkboxId, hiddenName) {
           const checkbox = document.getElementById(checkboxId);
           const hiddenInputs = document.querySelectorAll(`input[type="hidden"][name="${hiddenName}"]`);
-
           if (checkbox && hiddenInputs.length) {
             const hidden = hiddenInputs[0];
             checkbox.addEventListener("change", () => {
@@ -545,6 +587,40 @@
           toggleCustomParts();
         }
 
+        function getCapstoneValue() {
+          const checked = document.querySelector('input[name="IfCapstonePolicyRadios"]:checked');
+          return checked ? checked.value : "";
+        }
+
+        function toggleCapstoneFields() {
+          const val = getCapstoneValue();
+          if (capstoneHidden) capstoneHidden.value = val;
+
+          if (val === "Y") {
+            userAgreedValue.disabled = false;
+            userAgreedValue.required = true;
+            carNewCostValue.value = "";
+            carNewCostValue.disabled = true;
+            carNewCostValue.required = false;
+          } else if (val === "N") {
+            carNewCostValue.disabled = false;
+            carNewCostValue.required = true;
+            userAgreedValue.value = "";
+            userAgreedValue.disabled = true;
+            userAgreedValue.required = false;
+          } else {
+            userAgreedValue.value = "";
+            carNewCostValue.value = "";
+            userAgreedValue.disabled = true;
+            carNewCostValue.disabled = true;
+            userAgreedValue.required = false;
+            carNewCostValue.required = false;
+          }
+        }
+
+        capstoneRadios.forEach(r => r.addEventListener("change", toggleCapstoneFields));
+        toggleCapstoneFields();
+
         const requestRadios = document.querySelectorAll('input[name="requestTypeRadios"]');
         const requestHiddenSelect = document.getElementById("00NU7000006IOzh");
 
@@ -570,11 +646,13 @@
           { radioGroupName: "requestTypeRadios", label: "Select the Request Type:" },
           { id: "00NU7000005zuX3", label: "Policy Number", type: "policy" },
           { id: "00NU7000005zuLl", label: "Effective Date (MM/DD/YYYY)", type: "date" },
+          { radioGroupName: "IfCapstonePolicyRadios", label: "If Capstone Policy or Not:", type: "capstone" },
           { id: "00NU7000007EGYk", label: "New Vehicle Year", type: "year" },
           { id: "00NU700000616W9", label: "New Vehicle Make" },
           { id: "00NU700000616Xl", label: "New Vehicle Model" },
           { id: "00NU7000006Knh3", label: "VIN Number of New Vehicle" },
-          { id: "00NU7000008lT1x", label: "Car New Cost Value" }
+          { id: "00NU7000009B2Cb", label: "User Agreed Value", type: "capstoneY" },
+          { id: "00NU7000008lT1x", label: "Car New Cost Value", type: "capstoneN" }
         ];
 
         function formatDateForJSON(dateString) {
@@ -586,16 +664,17 @@
         function captureAllFormDataAsJSON() {
           const formData = {};
           const formElements = form.querySelectorAll("input, textarea, select");
+          const capstoneVal = getCapstoneValue();
+
           formElements.forEach(element => {
             if (
               !element.name ||
               element.name === "Form_Captured_Data__c" ||
               element.name === "Form_Missing_Data__c" ||
               element.name === "00NU7000008TS4L" ||
-              element.name === "requestTypeRadios"
-            ) {
-              return;
-            }
+              element.name === "requestTypeRadios" ||
+              element.name === "IfCapstonePolicyRadios"
+            ) return;
 
             let fieldName = element.name.replace(/__c$/, "");
             const skipFields = ["company", "delete_Action_Form", "lead_source", "phone", "status", "last_name", "first_name", "retURL", "oid"];
@@ -613,6 +692,8 @@
               "00NU700000616W9": "Make",
               "00NU700000616Xl": "Model",
               "00NU7000006Knh3": "VIN_number_2",
+              "IfCapstonePolicy__c": "IfCapstonePolicy",
+              "00NU7000009B2Cb": "User_Agreed_Value",
               "00NU7000008lT1x": "Car_New_Cost_Value",
               "00NU7000007ALC1": "Other_than_Collision",
               "00NU7000008AbwA": "Full_Safety_Glass",
@@ -629,6 +710,12 @@
 
             if (fieldName === "Effective_Date" && element.value) {
               formData[fieldName] = formatDateForJSON(element.value);
+            } else if (fieldName === "User_Agreed_Value" && capstoneVal !== "Y") {
+              formData[fieldName] = "";
+            } else if (fieldName === "Car_New_Cost_Value" && capstoneVal !== "N") {
+              formData[fieldName] = "";
+            } else if (fieldName === "If_Capstone_Policy") {
+              formData[fieldName] = capstoneVal;
             } else {
               formData[fieldName] = element.value || "";
             }
@@ -647,6 +734,7 @@
 
         function validateFields() {
           const missing = [];
+          const capstoneVal = getCapstoneValue();
 
           requiredFields.forEach(field => {
             if (field.radioGroupName) {
@@ -666,10 +754,15 @@
               const dateRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}$/;
               if (!val || !dateRegex.test(val)) missing.push(field.label);
             } else if (field.type === "year") {
-              const val = el.value.trim();
-              if (!val || !validateYear(val)) missing.push(field.label);
+              if (!validateYear(el.value.trim())) missing.push(field.label);
             } else if (field.type === "policy") {
               if (!el.value.trim() || !validatePolicyNumber(el.value)) missing.push(field.label);
+            } else if (field.type === "capstone") {
+              if (!capstoneVal) missing.push(field.label);
+            } else if (field.type === "capstoneY") {
+              if (capstoneVal === "Y" && !el.value.trim()) missing.push(field.label);
+            } else if (field.type === "capstoneN") {
+              if (capstoneVal === "N" && !el.value.trim()) missing.push(field.label);
             } else {
               if (!el.value.trim()) missing.push(field.label);
             }
@@ -683,20 +776,46 @@
             dateInput.value = picker.toString();
           }
 
+          const capstoneVal = getCapstoneValue();
+          if (capstoneHidden) capstoneHidden.value = capstoneVal;
+
           const missing = [];
           const filled = [];
 
           requiredFields.forEach(field => {
             if (field.radioGroupName) {
-              const radios = document.querySelectorAll(`input[name="${field.radioGroupName}"]`);
-              const checked = [...radios].find(r => r.checked);
+              const checked = document.querySelector(`input[name="${field.radioGroupName}"]:checked`);
               if (checked) filled.push(`${field.label}: ${checked.value}`);
               else missing.push(field.label);
               return;
             }
 
             const el = document.getElementById(field.id);
-            if (!el || !el.value.trim()) {
+            if (!el) return;
+
+            if (field.type === "capstone") {
+              if (!capstoneVal) missing.push(field.label);
+              else filled.push(`${field.label}: ${capstoneVal}`);
+              return;
+            }
+
+            if (field.type === "capstoneY") {
+              if (capstoneVal === "Y") {
+                if (el.value.trim()) filled.push(`User Agreed Value: ${el.value.trim()}`);
+                else missing.push("User Agreed Value");
+              }
+              return;
+            }
+
+            if (field.type === "capstoneN") {
+              if (capstoneVal === "N") {
+                if (el.value.trim()) filled.push(`Car New Cost Value: ${el.value.trim()}`);
+                else missing.push("Car New Cost Value");
+              }
+              return;
+            }
+
+            if (!el.value.trim()) {
               missing.push(field.label);
             } else {
               filled.push(`${field.label}: ${el.value.trim()}`);
